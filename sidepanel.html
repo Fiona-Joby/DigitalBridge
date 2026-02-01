@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; background: #f9f9f9; width: 320px; }
+    h2 { color: #2c3e50; font-size: 1.2rem; }
+    textarea { width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 10px; box-sizing: border-box; }
+    .meter-container { height: 10px; background: #eee; border-radius: 5px; margin: 15px 0; overflow: hidden; }
+    #stress-bar { height: 100%; width: 0%; transition: width 0.5s, background 0.5s; }
+    .btn { background: #3498db; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%; cursor: pointer; font-weight: bold; }
+    .btn:hover { background: #2980b9; }
+    .output-box { background: white; border-radius: 8px; padding: 10px; border: 1px solid #ddd; margin-top: 15px; min-height: 50px; font-size: 0.95rem; }
+    .lang-label { font-size: 0.8rem; font-weight: bold; color: #7f8c8d; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Digital Bridge</h2>
+  <textarea id="inputText" rows="4" placeholder="Paste complex text here..."></textarea>
+  
+  <div class="lang-label">Complexity Level</div>
+  <div class="meter-container"><div id="stress-bar"></div></div>
+  
+  <button id="simplifyBtn" class="btn">Simplify & Translate</button>
+
+  <div class="lang-label">Easy English</div>
+  <div id="englishOutput" class="output-box">...</div>
+  
+  <div class="lang-label">Malayalam Translation</div>
+  <div id="malayalamOutput" class="output-box" style="font-family: 'Arial Unicode MS';">...</div>
+  
+  <button id="speakBtn" class="btn" style="margin-top:10px; background: #27ae60;">🔊 Listen (Malayalam)</button>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
