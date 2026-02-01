@@ -1,14 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Digital Bridge: Malayalam Jargon Simplifier",
+  "name": "Digital Bridge",
   "version": "1.0",
-  "description": "Simplifies complex jargon into easy English and Malayalam with voice output.",
-  "permissions": ["sidePanel", "storage", "activeTab", "scripting"],
-  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+  "permissions": ["sidePanel"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_title": "Open Digital Bridge"
+    "default_title": "Click to open Digital Bridge"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
-  }
+  },
+  "host_permissions": [
+    "http://127.0.0.1:5000/*"
+  ]
 }

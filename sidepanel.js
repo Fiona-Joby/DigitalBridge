@@ -1,43 +1,68 @@
-const API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+// --- CONFIGURATION ---
+const BACKEND_URL = 'http://127.0.0.1:5000/simplify';
 
+// --- UI LOGIC ---
 document.getElementById('simplifyBtn').addEventListener('click', async () => {
     const text = document.getElementById('inputText').value;
-    if (!text) return;
+    if (!text) {
+        alert("Please paste some text first!");
+        return;
+    }
 
-    // 1. Calculate Stress-O-Meter
-    const words = text.split(/\s+/);
-    const complex = words.filter(w => w.length > 8).length;
-    const ratio = Math.min((complex / words.length) * 100 * 2, 100);
-    const bar = document.getElementById('stress-bar');
-    bar.style.width = ratio + "%";
-    bar.style.background = ratio > 60 ? "#e74c3c" : ratio > 30 ? "#f1c40f" : "#2ecc71";
+    // 1. Calculate Stress-O-Meter (Local Logic)
+    calculateStress(text);
 
-    // 2. Call Gemini API
-    document.getElementById('englishOutput').innerText = "Thinking...";
-    document.getElementById('malayalamOutput').innerText = "ചിന്തിക്കുന്നു...";
+    // 2. Update UI for Loading State
+    document.getElementById('englishOutput').innerText = "Simplifying...";
+    document.getElementById('malayalamOutput').innerText = "പരിഭാഷപ്പെടുത്തുന്നു...";
 
-    const prompt = `Simplify this text for a 10-year-old. Provide only a JSON response with keys "english" and "malayalam". \nText: ${text}`;
-    
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        // 3. Call your Flask Backend
+        const response = await fetch(BACKEND_URL, {
             method: 'POST',
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
         });
-        const data = await response.json();
-        const rawResult = data.candidates[0].content.parts[0].text;
-        const cleanedJson = JSON.parse(rawResult.replace(/```json|```/g, ""));
 
-        document.getElementById('englishOutput').innerText = cleanedJson.english;
-        document.getElementById('malayalamOutput').innerText = cleanedJson.malayalam;
-    } catch (e) {
-        document.getElementById('englishOutput').innerText = "Error simplifying text.";
+        if (!response.ok) throw new Error("Backend server is not responding.");
+
+        const data = await response.json();
+
+        // 4. Display Results
+        document.getElementById('englishOutput').innerText = data.english;
+        document.getElementById('malayalamOutput').innerText = data.malayalam;
+
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById('englishOutput').innerText = "Error: Make sure your Python backend is running!";
+        document.getElementById('malayalamOutput').innerText = "സർവർ പ്രവർത്തിക്കുന്നില്ല.";
     }
 });
 
-// 3. Malayalam Voice Output
+// --- HELPER FUNCTIONS ---
+
+// Stress-O-Meter Calculation
+function calculateStress(text) {
+    const words = text.split(/\s+/);
+    // Logic: Words longer than 9 characters are usually jargon
+    const complexWords = words.filter(word => word.length > 9).length;
+    const score = Math.min((complexWords / words.length) * 100 * 1.5, 100);
+    
+    const bar = document.getElementById('stress-bar');
+    bar.style.width = score + "%";
+    
+    // Color change based on stress
+    if (score < 30) bar.style.background = "#2ecc71"; // Green
+    else if (score < 60) bar.style.background = "#f1c40f"; // Yellow
+    else bar.style.background = "#e74c3c"; // Red
+}
+
+// Malayalam Voice Output
 document.getElementById('speakBtn').addEventListener('click', () => {
     const mlText = document.getElementById('malayalamOutput').innerText;
-    // Native Google Malayalam TTS trick
+    if (mlText === "..." || mlText.includes("പരിഭാഷപ്പെടുത്തുന്നു")) return;
+
+    // High-quality Google TTS Stream
     const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(mlText)}&tl=ml&client=tw-ob`;
     const audio = new Audio(url);
     audio.play();
