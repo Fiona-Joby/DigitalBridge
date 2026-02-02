@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app) 
 
 # Using your API key
-client = genai.Client(api_key="")
+client = genai.Client(api_key="")  #add api key
 
 @app.route('/simplify', methods=['POST'])
 def simplify():
