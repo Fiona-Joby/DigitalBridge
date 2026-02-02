@@ -58,12 +58,23 @@ function calculateStress(text) {
 }
 
 // Malayalam Voice Output
+// Malayalam Voice Output using Web Speech API
 document.getElementById('speakBtn').addEventListener('click', () => {
     const mlText = document.getElementById('malayalamOutput').innerText;
-    if (mlText === "..." || mlText.includes("പരിഭാഷപ്പെടുത്തുന്നു")) return;
+    
+    // 1. Check if we have text to speak
+    if (!mlText || mlText.includes("പരിഭാഷപ്പെടുത്തുന്നു") || mlText === "...") return;
 
-    // High-quality Google TTS Stream
+    // 2. The "Hack" URL - Use the 'tw-ob' client ID to bypass some blocks
     const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(mlText)}&tl=ml&client=tw-ob`;
+    
+    // 3. Play via an Audio object
     const audio = new Audio(url);
-    audio.play();
+    audio.play().catch(e => {
+        console.error("Audio failed. Your browser might still be blocking the external URL.", e);
+        // Fallback to system TTS if the URL is blocked
+        const utterance = new SpeechSynthesisUtterance(mlText);
+        utterance.lang = 'ml-IN';
+        window.speechSynthesis.speak(utterance);
+    });
 });
